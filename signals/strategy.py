@@ -3,7 +3,7 @@ from typing import Sequence
 import yfinance as yf
 
 class BreakoutSignal:
-    def _init_(self, lookback:int):
+    def __init__(self, lookback: int):  
         self.lookback = lookback
     
     def generate(self, prices: Sequence[float]) -> np.ndarray:
@@ -12,11 +12,11 @@ class BreakoutSignal:
 
         for i in range(self.lookback, len(prices)):
             window = prices[i-self.lookback:i]
-            signals[i] = np.where(prices[i]>window.max(), 1, np.where(prices[i] < window.min(), -1, 0))
+            signals[i] = np.where(prices[i] > window.max(), 1, np.where(prices[i] < window.min(), -1, 0))
         return signals
     
 class MovingAverageCrossOver:
-    def _init_(self, short:int, long:int):
+    def __init__(self, short: int, long: int): 
         self.short = short
         self.long = long
     
@@ -24,7 +24,7 @@ class MovingAverageCrossOver:
         prices = np.array(prices, dtype=float)
         ma = np.zeros_like(prices, dtype=float)
         for i in range(len(prices)):
-            if i+1 < window:
+            if i + 1 < window:
                 ma[i] = 0 
             else:
                 ma[i] = np.mean(prices[i+1-window:i+1])
@@ -34,40 +34,32 @@ class MovingAverageCrossOver:
         short_ma = self.moving_average(prices, self.short)
         long_ma = self.moving_average(prices, self.long)
         signals = np.where(short_ma > long_ma, 1,
-                np.where(short_ma < long_ma, -1, 0))
+                           np.where(short_ma < long_ma, -1, 0))
         return signals
     
 class SignalCombiner:
-    def _init_(self):
+    def __init__(self): 
         return
     
     def combine(self, signal1, signal2):
         final_signal = []
         for sig1, sig2 in zip(signal1, signal2):
-            final_signal.append((sig1+sig2)//2)
-        return final_signal
-
-     
-
-            
-
+            final_signal.append((sig1 + sig2) // 2)
+        return np.array(final_signal) 
 
 
 ticker_symbol = "META"
-prices = list(yf.download(tickers=ticker_symbol, start = "2020-01-01", end = "2025-10-21")['Close'][ticker_symbol])
+prices = list(yf.download(tickers=ticker_symbol, start="2020-01-01", end="2025-10-21")['Close'][ticker_symbol])
+
 lookback = 2
 breakout = BreakoutSignal(lookback)
 signals_breakout = breakout.generate(prices)
-# print("Prices:  ", prices)
 print("signals_breakout: ", signals_breakout.tolist())
 
 short_window = 2
 long_window = 3
-
 mac = MovingAverageCrossOver(short_window, long_window)
 signals_mac = mac.generate_ma_signals(prices)
-
-# print("Prices:  ", prices)
 print("signals_mac     : ", signals_mac.tolist())
 
 signal_combiner = SignalCombiner()
