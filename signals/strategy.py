@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Sequence
+import yfinance as yf
 
 class BreakoutSignal:
     def _init_(self, lookback:int):
@@ -51,24 +52,24 @@ class SignalCombiner:
             
 
 
-if _name_ == "_main_":
-    prices = [100, 101, 102, 101, 99, 98, 100, 102]
-    lookback = 2
-    breakout = BreakoutSignal(lookback)
-    signals_breakout = breakout.generate(prices)
-    # print("Prices:  ", prices)
-    print("signals_breakout: ", signals_breakout.tolist())
 
-    prices = [100, 101, 102, 101, 99, 98, 100, 102]
-    short_window = 2
-    long_window = 3
+ticker_symbol = "META"
+prices = list(yf.download(tickers=ticker_symbol, start = "2020-01-01", end = "2025-10-21")['Close'][ticker_symbol])
+lookback = 2
+breakout = BreakoutSignal(lookback)
+signals_breakout = breakout.generate(prices)
+# print("Prices:  ", prices)
+print("signals_breakout: ", signals_breakout.tolist())
 
-    mac = MovingAverageCrossOver(short_window, long_window)
-    signals_mac = mac.generate_ma_signals(prices)
+short_window = 2
+long_window = 3
 
-    # print("Prices:  ", prices)
-    print("signals_mac     : ", signals_mac.tolist())
+mac = MovingAverageCrossOver(short_window, long_window)
+signals_mac = mac.generate_ma_signals(prices)
 
-    signal_combiner = SignalCombiner()
-    final_signal = signal_combiner.combine(signals_breakout, signals_mac)
-    print("final signal    : ", final_signal)
+# print("Prices:  ", prices)
+print("signals_mac     : ", signals_mac.tolist())
+
+signal_combiner = SignalCombiner()
+final_signal = signal_combiner.combine(signals_breakout, signals_mac)
+print("final signal    : ", final_signal)
