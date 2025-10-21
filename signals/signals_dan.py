@@ -11,7 +11,9 @@ class BreakoutSignal:
 
         for i in range(self.lookback, len(prices)):
             window = prices[i-self.lookback:i]
-            signals[i] = np.where(prices[i]>window.max(), 1, np.where(prices[i] < window.min(), -1, 0))
+            signals[i] = 0
+            signals[i] = np.where(prices[i] > window.max(), 1, signals[i])
+            signals[i] = np.where(prices[i] < window.min(), -1, signals[i])
         return signals
     
 class MovingAverageCrossOver:
