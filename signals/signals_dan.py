@@ -32,8 +32,8 @@ class MovingAverageCrossOver:
     def generate_ma_signals(self, prices: Sequence[float]) -> np.ndarray:
         short_ma = self.moving_average(prices, self.short)
         long_ma = self.moving_average(prices, self.long)
-        signals = np.where(short_ma > long_ma, 1,
-                np.where(short_ma < long_ma, -1, 0))
+        signals = np.where(short_ma > long_ma, 1, 0)
+        signals = np.where(short_ma < long_ma, -1, signals)
         return signals
     
 class SignalCombiner:
