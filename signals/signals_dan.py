@@ -45,28 +45,53 @@ class SignalCombiner:
     def combine(self, signal1, signal2):
         final_signal = []
         for sig1, sig2 in zip(signal1, signal2):
-            final_signal.append((sig1+sig2)//2)
+            final_signal.append(round((sig1+sig2)/2))
         return final_signal
 
+import yfinance as yf
 
 if __name__ == "__main__":
+    # # breakout
+    # prices = [100, 101, 102, 101, 99, 98, 100, 102]
+    # lookback = 2
+    # breakout = BreakoutSignal(lookback)
+    # signals_breakout = breakout.generate(prices)
+    # print("signals_breakout: ", signals_breakout.tolist())
+
+    # # moving average
+    # short_window = 2
+    # long_window = 3
+
+    # mac = MovingAverageCrossOver(short_window, long_window)
+    # signals_mac = mac.generate_ma_signals(prices)
+
+    # # print("Prices:  ", prices)
+    # print("signals_mac     : ", signals_mac.tolist())
+
+    # signal_combiner = SignalCombiner()
+    # final_signal = signal_combiner.combine(signals_breakout, signals_mac)
+    # print("final signal    : ", final_signal)
+
+    # --- load stock data from yahoo finanace ---
+    s1 = yf.download("AAPL", start="2024-01-01", end="2024-06-30")
+
+    # close prices for signal generation
+    prices = s1["Close"].values.squeeze()
+
     # breakout
-    prices = [100, 101, 102, 101, 99, 98, 100, 102]
-    lookback = 2
+    lookback = 5
     breakout = BreakoutSignal(lookback)
     signals_breakout = breakout.generate(prices)
-    print("signals_breakout: ", signals_breakout.tolist())
+    print("signals_breakout:", signals_breakout[-10:].tolist())
 
     # moving average
-    short_window = 2
-    long_window = 3
-
+    short_window = 10
+    long_window = 20
     mac = MovingAverageCrossOver(short_window, long_window)
     signals_mac = mac.generate_ma_signals(prices)
+    print("signals_mac     :", signals_mac[-10:].tolist())
 
-    # print("Prices:  ", prices)
-    print("signals_mac     : ", signals_mac.tolist())
-
+    # combine signals
     signal_combiner = SignalCombiner()
     final_signal = signal_combiner.combine(signals_breakout, signals_mac)
-    print("final signal    : ", final_signal)
+    print("final signal    :", final_signal[-10:])
