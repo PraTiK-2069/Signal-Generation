@@ -44,7 +44,10 @@ class SignalCombiner:
     def combine(self, signal1, signal2):
         final_signal = []
         for sig1, sig2 in zip(signal1, signal2):
-            final_signal.append((sig1 + sig2) // 2)
+            signal = (sig1 + sig2)/2
+            if -1 <signal < 1:
+                signal = 0
+            final_signal.append(signal)
         return np.array(final_signal) 
 
 
